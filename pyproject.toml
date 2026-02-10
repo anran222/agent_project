@@ -1,0 +1,25 @@
+[project]
+name = "agent-project"
+version = "0.1.0"
+description = "Agent learning playground"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+  {name = "Your Name"}
+]
+
+dependencies = []
+
+[project.scripts]
+agent-project = "agent_project.main:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
