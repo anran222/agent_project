@@ -71,3 +71,28 @@ CREATE TABLE IF NOT EXISTS tasks (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   UNIQUE KEY uniq_task (session_id, title)
 ) ENGINE=InnoDB COMMENT='任务状态表';
+
+CREATE TABLE IF NOT EXISTS chat_sessions (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '会话主键ID',
+  user_id BIGINT NOT NULL COMMENT '所属用户ID（users.id）',
+  title VARCHAR(255) NOT NULL COMMENT '会话标题',
+  last_message_preview VARCHAR(255) NOT NULL DEFAULT '' COMMENT '最近一条消息的摘要',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  INDEX idx_chat_sessions_user_updated (user_id, updated_at),
+  CONSTRAINT fk_chat_sessions_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB COMMENT='聊天会话表';
+
+CREATE TABLE IF NOT EXISTS chat_messages (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '消息主键ID',
+  session_id BIGINT NOT NULL COMMENT '会话ID（chat_sessions.id）',
+  user_id BIGINT NOT NULL COMMENT '所属用户ID（冗余字段，便于审计）',
+  role VARCHAR(16) NOT NULL COMMENT '消息角色：user / assistant / system',
+  content TEXT NOT NULL COMMENT '消息正文',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  INDEX idx_chat_messages_session_id (session_id, id),
+  CONSTRAINT fk_chat_messages_session FOREIGN KEY (session_id) REFERENCES chat_sessions(id) ON DELETE CASCADE
+) ENGINE=InnoDB COMMENT='聊天消息表（前端会话历史）';
+
+

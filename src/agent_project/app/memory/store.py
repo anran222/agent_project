@@ -49,7 +49,7 @@ class MemoryStore:
         Returns:
             List of messages.
         """
-        rows = self.repo.recent_messages(self.session_id, limit)
+        rows = list(self.repo.recent_messages(self.session_id, limit))
         rows.reverse()
         return [Message(role=row["role"], content=row["content"]) for row in rows]
 

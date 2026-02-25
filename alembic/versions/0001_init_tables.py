@@ -23,6 +23,8 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    op.execute("DROP TABLE IF EXISTS chat_messages")
+    op.execute("DROP TABLE IF EXISTS chat_sessions")
     op.execute("DROP TABLE IF EXISTS tasks")
     op.execute("DROP TABLE IF EXISTS user_profile")
     op.execute("DROP TABLE IF EXISTS memory_summary")

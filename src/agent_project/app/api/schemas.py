@@ -26,6 +26,7 @@ class UserResponse(BaseModel):
 class ChatRequest(BaseModel):
     """Chat request payload."""
     message: str = Field(..., min_length=1)
+    session_id: int | None = None
 
 
 class ChatResponse(BaseModel):
@@ -34,3 +35,36 @@ class ChatResponse(BaseModel):
     tool: str
     tool_result: str
     user_id: int
+    session_id: int
+
+
+class SessionCreateRequest(BaseModel):
+    """Create session request payload."""
+
+    title: str = Field(default="新会话", min_length=1, max_length=255)
+
+
+class SessionRenameRequest(BaseModel):
+    """Rename session request payload."""
+
+    title: str = Field(..., min_length=1, max_length=255)
+
+
+class SessionResponse(BaseModel):
+    """Session response payload."""
+
+    session_id: int
+    title: str
+    last_message_preview: str
+    created_at: str
+    updated_at: str
+
+
+class SessionMessageResponse(BaseModel):
+    """Session message response payload."""
+
+    message_id: int
+    session_id: int
+    role: str
+    content: str
+    created_at: str

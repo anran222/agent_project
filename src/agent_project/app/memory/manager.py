@@ -68,15 +68,25 @@ class MemoryManager:
         self.store.add_message("assistant", assistant_output)
 
         if self.llm_client:
-            extracted = self._llm_extract(user_input, assistant_output)
-            self._apply_extracted(extracted)
+            try:
+                extracted = self._llm_extract(user_input, assistant_output)
+                self._apply_extracted(extracted)
+            except Exception:
+                # Do not fail chat pipeline when extraction is unstable.
+                pass
 
         if self.store.message_count() % self.summary_interval == 0:
-            summary = self._build_summary()
-            if summary:
-                self.store.set_summary(summary)
+            try:
+                summary = self._build_summary()
+                if summary:
+                    self.store.set_summary(summary)
+            except Exception:
+                pass
 
-        self.store.cleanup()
+        try:
+            self.store.cleanup()
+        except Exception:
+            pass
 
     def _insert_memory_item(self, mem_type: str, content: str, importance: float) -> int:
         """Insert a memory item and return its id.
@@ -138,11 +148,26 @@ class MemoryManager:
         Returns:
             Context string for prompting.
         """
-        short_term = self.store.recent_messages(limit=self.max_short_term)
-        profile = self.store.get_profile()
-        summary = self.store.latest_summary() or ""
-        tasks = self.store.list_open_tasks(limit=3)
-        long_term = self.retrieve_long_term(user_input)
+        try:
+            short_term = self.store.recent_messages(limit=self.max_short_term)
+        except Exception:
+            short_term = []
+        try:
+            profile = self.store.get_profile()
+        except Exception:
+            profile = {}
+        try:
+            summary = self.store.latest_summary() or ""
+        except Exception:
+            summary = ""
+        try:
+            tasks = self.store.list_open_tasks(limit=3)
+        except Exception:
+            tasks = []
+        try:
+            long_term = self.retrieve_long_term(user_input)
+        except Exception:
+            long_term = []
 
         sections: List[str] = []
         if profile:
