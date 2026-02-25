@@ -10,7 +10,7 @@ class Settings:
         self.mysql_host = get_env("MYSQL_HOST", "127.0.0.1")
         self.mysql_port = int(get_env("MYSQL_PORT", "3306"))
         self.mysql_user = get_env("MYSQL_USER", "root")
-        self.mysql_password = get_env("MYSQL_PASSWORD", "")
+        self.mysql_password = get_env("MYSQL_PASSWORD", "xar19990313")
         self.mysql_db = get_env("MYSQL_DB", "agent_project")
 
         self.redis_host = get_env("REDIS_HOST", "127.0.0.1")

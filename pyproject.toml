@@ -9,7 +9,14 @@ authors = [
   {name = "Your Name"}
 ]
 
-dependencies = []
+dependencies = [
+  "fastapi",
+  "uvicorn",
+  "pymysql",
+  "redis",
+  "sqlalchemy",
+  "alembic",
+]
 
 [project.scripts]
 agent-project = "agent_project.main:main"

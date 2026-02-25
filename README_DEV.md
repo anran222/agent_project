@@ -10,5 +10,5 @@ cd /Users/a147735/agent_study/agent_project
 python -m venv .venv
 source .venv/bin/activate
 pip install -e .
-python -m agent_project
+uvicorn agent_project.app.api.server:app --host 127.0.0.1 --port 8000 --app-dir src
 ```
