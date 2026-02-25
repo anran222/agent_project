@@ -1,0 +1,60 @@
+CREATE TABLE IF NOT EXISTS users (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  phone VARCHAR(20) NOT NULL UNIQUE,
+  password_hash VARCHAR(128) NOT NULL,
+  salt VARCHAR(64) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS messages (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  session_id VARCHAR(64) NOT NULL,
+  role VARCHAR(16) NOT NULL,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_messages_session (session_id)
+);
+
+CREATE TABLE IF NOT EXISTS memory_items (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  session_id VARCHAR(64) NOT NULL,
+  mem_type VARCHAR(32) NOT NULL,
+  content TEXT NOT NULL,
+  importance DOUBLE NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_memory_session (session_id)
+);
+
+CREATE TABLE IF NOT EXISTS memory_vectors (
+  item_id BIGINT PRIMARY KEY,
+  vector JSON NOT NULL,
+  model VARCHAR(64) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY(item_id) REFERENCES memory_items(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS memory_summary (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  session_id VARCHAR(64) NOT NULL,
+  summary TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_summary_session (session_id)
+);
+
+CREATE TABLE IF NOT EXISTS user_profile (
+  session_id VARCHAR(64) NOT NULL,
+  `key` VARCHAR(64) NOT NULL,
+  value TEXT NOT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (session_id, `key`)
+);
+
+CREATE TABLE IF NOT EXISTS tasks (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  session_id VARCHAR(64) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  status VARCHAR(32) NOT NULL,
+  notes TEXT,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uniq_task (session_id, title)
+);

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sys
 
-from agent_project.llm_client import LLMClient
+from agent_project.app.llm.client import LLMClient
 
 
 def main() -> int:

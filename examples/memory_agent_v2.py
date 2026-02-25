@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import argparse
-from pathlib import Path
 
-from agent_project.llm_client import LLMClient
-from agent_project.memory_system import MemoryManager, MemoryStore
+from agent_project.app.llm.client import LLMClient
+from agent_project.app.memory.store import MemoryStore
+from agent_project.app.memory.manager import MemoryManager
 
 
 def build_prompt(context: str, user_input: str) -> str:
@@ -19,18 +19,17 @@ def build_prompt(context: str, user_input: str) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--db", default="/Users/a147735/agent_study/agent_project/data/memory.db")
+    parser.add_argument("--session", default="default")
     parser.add_argument("--reset", action="store_true")
     args = parser.parse_args()
 
-    store = MemoryStore(Path(args.db))
+    store = MemoryStore(session_id=args.session)
     if args.reset:
         store.reset_all()
         print("Memory cleared.")
         return 0
 
-    client = LLMClient.from_env()
-    manager = MemoryManager(store=store, llm_client=client)
+    manager = MemoryManager(store=store, llm_client=LLMClient.from_env())
 
     while True:
         user_input = input("You: ").strip()
@@ -41,7 +40,7 @@ def main() -> int:
 
         context = manager.build_context(user_input)
         prompt = build_prompt(context, user_input)
-        answer = client.generate(prompt=prompt, system=None)
+        answer = manager.llm_client.generate(prompt=prompt, system=None)
         print(f"Assistant: {answer}")
 
         manager.write_from_turn(user_input, answer)

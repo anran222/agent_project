@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterable, List, Tuple
 
-from agent_project.llm_client import LLMClient
+from agent_project.app.llm.client import LLMClient
 
 
 @dataclass

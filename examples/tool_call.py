@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from typing import Any, Dict
 
-from agent_project.llm_client import LLMClient
+from agent_project.app.llm.client import LLMClient
 
 
 def get_time(args: Dict[str, Any]) -> str:

@@ -49,6 +49,18 @@ class LLMClient:
                 return json.loads(raw[start : end + 1])
         raise
 
+    def generate_stream(self, prompt: str, system: Optional[str] = None):
+        if self.config.provider == "ollama":
+            yield from self._ollama_generate_stream(prompt=prompt, system=system)
+            return
+        if self.config.provider == "mock":
+            yield self._mock_generate(prompt=prompt, system=system)
+            return
+        raise ValueError(
+            f"Unsupported provider: {self.config.provider}. "
+            "Set LLM_PROVIDER=ollama or LLM_PROVIDER=mock."
+        )
+
     def embed(self, text: str) -> List[float]:
         if self.config.provider == "ollama":
             return self._ollama_embed(text=text)
@@ -92,6 +104,33 @@ class LLMClient:
         with urllib.request.urlopen(req, timeout=60) as resp:
             data = json.loads(resp.read().decode("utf-8"))
         return data.get("embedding", [])
+
+    def _ollama_generate_stream(self, prompt: str, system: Optional[str]):
+        url = f"{self.config.base_url}/api/generate"
+        payload = {
+            "model": self.config.model,
+            "prompt": prompt,
+            "system": system or "",
+            "stream": True,
+        }
+        body = json.dumps(payload).encode("utf-8")
+        req = urllib.request.Request(
+            url,
+            data=body,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            for raw in resp:
+                try:
+                    data = json.loads(raw.decode("utf-8"))
+                except json.JSONDecodeError:
+                    continue
+                chunk = data.get("response", "")
+                if chunk:
+                    yield chunk
+                if data.get("done"):
+                    break
 
     def _mock_generate(self, prompt: str, system: Optional[str]) -> str:
         # Deterministic mock response for learning/testing without a real LLM.

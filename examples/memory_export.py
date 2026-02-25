@@ -4,7 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
-from agent_project.memory_system import MemoryStore
+from agent_project.app.memory.store import MemoryStore
 
 
 def export_json(store: MemoryStore, out_path: Path) -> None:
@@ -123,12 +123,11 @@ def export_html(store: MemoryStore, out_path: Path) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--db", default="/Users/a147735/agent_study/agent_project/data/memory.db")
     parser.add_argument("--session", default="default")
     parser.add_argument("--out", required=True, help="Output file path (.json/.md/.html)")
     args = parser.parse_args()
 
-    store = MemoryStore(Path(args.db), session_id=args.session)
+    store = MemoryStore(session_id=args.session)
     out_path = Path(args.out)
     if out_path.suffix == ".json":
         export_json(store, out_path)

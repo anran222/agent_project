@@ -26,12 +26,12 @@ python /Users/a147735/agent_study/agent_project/examples/tool_call.py
 
 ## 4. 记忆示例（分层记忆 + 检索策略）
 ```bash
-python /Users/a147735/agent_study/agent_project/examples/memory_agent_v2.py
+python /Users/a147735/agent_study/agent_project/examples/memory_agent_v2.py --session u1
 ```
 
 清空记忆：
 ```bash
-python /Users/a147735/agent_study/agent_project/examples/memory_agent_v2.py --reset
+python /Users/a147735/agent_study/agent_project/examples/memory_agent_v2.py --session u1 --reset
 ```
 
 ## 5. 记忆导出/可视化
@@ -43,8 +43,9 @@ python /Users/a147735/agent_study/agent_project/examples/memory_export.py --out 
 
 ## 6. 端到端链路 API（记忆 + RAG + 工具）
 ```bash
+pip install -r /Users/a147735/agent_study/agent_project/requirements.api.txt
 PYTHONPATH=/Users/a147735/agent_study/agent_project/src \
-python3 /Users/a147735/agent_study/agent_project/src/agent_project/api_server.py
+uvicorn agent_project.app.api.server:app --host 127.0.0.1 --port 8080
 ```
 
 测试请求：
@@ -52,6 +53,17 @@ python3 /Users/a147735/agent_study/agent_project/src/agent_project/api_server.py
 curl -X POST http://127.0.0.1:8080/chat \
   -H 'Content-Type: application/json' \
   -d '{"session_id":"u1","message":"请告诉我北京时间，并解释RAG是什么"}'
+```
+
+## 数据库与Redis配置
+参考 `.env.example`，先创建 MySQL 数据库并执行：
+```bash
+mysql -u root -p agent_project < /Users/a147735/agent_study/agent_project/sql/schema_mysql.sql
+```
+
+可选：使用 Alembic 迁移（需要先设置环境变量）：
+```bash
+alembic -c /Users/a147735/agent_study/agent_project/alembic.ini upgrade head
 ```
 
 ## 7. 使用 Ollama 的示例
